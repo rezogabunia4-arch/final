@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}{{ t("cal_title") }} — RemindMe{% endblock %}
+{% block page_class %}page-narrow{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ t("cal_title") }}</h1>
+    <p>{{ t("cal_subtitle") }}</p>
+</div>
+
+<div class="card card-pad" style="margin-bottom:24px;">
+    <div class="card-title">{{ t("cal_add_title") }}</div>
+
+    <form action="/calendar" method="POST">
+        <div class="form-grid">
+
+            <div class="form-group full">
+                <label>{{ t("cal_label_title") }}</label>
+                <input type="text"
+                       name="title"
+                       placeholder="..............."
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label>{{ t("cal_label_date") }}</label>
+                <input type="date" name="event_date" required>
+            </div>
+
+            <div class="form-group">
+                <label>{{ t("cal_label_type") }}</label>
+                <select name="event_type">
+                    <option value="birthday">{{ t("cal_type_birthday") }}</option>
+                    <option value="anniversary">{{ t("cal_type_anniversary") }}</option>
+                    <option value="holiday">{{ t("cal_type_holiday") }}</option>
+                    <option value="other">{{ t("cal_type_other") }}</option>
+                </select>
+            </div>
+
+            <div class="form-group full">
+                <label>{{ t("cal_label_note") }}</label>
+                <input type="text"
+                       name="note"
+                       placeholder="...">
+            </div>
+
+            <div class="form-group full">
+                <label class="checkbox-row">
+                    <input type="checkbox"
+                           name="repeat_yearly"
+                           checked>
+                    {{ t("cal_repeat_yearly") }}
+                </label>
+            </div>
+
+            <div class="form-group full">
+                <button type="submit" class="btn btn-primary">
+                    {{ t("cal_btn_add") }}
+                </button>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+{% if upcoming %}
+    {% for item in upcoming %}
+    <div class="item {% if item.days_left <= 7 %}soon{% endif %}">
+        <div class="item-body">
+
+            <div class="item-title">
+                {{ item.event.title }}
+            </div>
+
+            <div class="item-meta">
+                {{ item.next_date.strftime('%d %B %Y') }}
+                {% if item.event.note %}
+                    · {{ item.event.note }}
+                {% endif %}
+            </div>
+
+            <div class="item-tags">
+                <span class="tag">
+                    {% if item.days_left == 0 %}
+                        {{ t("days_today") }}
+                    {% elif item.days_left == 1 %}
+                        {{ t("days_tomorrow") }}
+                    {% else %}
+                        {{ t("days_in", n=item.days_left) }}
+                    {% endif %}
+                </span>
+            </div>
+
+        </div>
+
+        <a href="/calendar/delete/{{ item.event.id }}"
+           class="btn btn-danger-ghost btn-sm">
+            {{ t("cal_btn_delete") }}
+        </a>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="empty card card-pad">
+        <h3>{{ t("cal_empty_h3") }}</h3>
+        <p>{{ t("cal_empty_p") }}</p>
+    </div>
+{% endif %}
+
+{% endblock %}

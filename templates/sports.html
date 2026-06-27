@@ -1,0 +1,394 @@
+{% extends "base.html" %}
+{% block title %}{{ t("sports_title") }} — RemindMe{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='sports.css') }}">{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ t("nav_sports") }}</h1>
+    <p>{{ t("sports_subtitle") }}</p>
+</div>
+
+
+{% if sports_events %}
+<div style="margin-bottom:30px;padding-bottom:20px;border-bottom:2px solid var(--border)">
+    <h2>{{ t("sports_my_reminders") }} ({{ sports_events|length }})</h2>
+    {% for ev in sports_events %}
+    <div class="match-card" style="border-left:4px solid var(--accent2);margin-bottom:10px">
+        <div class="match-header">
+            <span class="match-league">🔔 {{ ev.sport_type|capitalize }}</span>
+            <span class="match-date-badge">📅 {{ ev.event_time.strftime('%d %b %Y, %H:%M') }}</span>
+        </div>
+        <div class="match-body">
+            <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px">{{ ev.title }}</div>
+            {% if ev.note %}
+            <div style="color:var(--muted);font-size:0.9rem">{{ ev.note }}</div>
+            {% endif %}
+        </div>
+        <div class="card-footer">
+            <a href="/sports/delete/{{ ev.id }}" class="btn btn-secondary btn-sm" style="text-decoration:none">{{ t("sports_btn_delete") }}</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="sport-filters">
+    <button type="button" class="chip active" onclick="showSport('all',this)">{{ t("sports_filter_all") }}</button>
+    <button type="button" class="chip" onclick="showSport('football',this)">{{ t("sports_filter_football") }}</button>
+    <button type="button" class="chip" onclick="showSport('basketball',this)">{{ t("sports_filter_basketball") }}</button>
+    <button type="button" class="chip" onclick="showSport('boxing',this)">{{ t("sports_filter_boxing") }}</button>
+    <button type="button" class="chip" onclick="showSport('mma',this)">{{ t("sports_filter_mma") }}</button>
+    <button type="button" class="chip" onclick="showSport('tennis',this)">{{ t("sports_filter_tennis") }}</button>
+    <button type="button" class="chip" onclick="showSport('rugby',this)">{{ t("sports_filter_rugby") }}</button>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}{% endwith %}
+<div class="flash success" id="toastMsg" style="display:none;">{{ t("sports_flash_added") }}</div>
+
+
+<div class="sport-section visible" id="sec-football">
+    <h2>football</h2>
+    <p class="sub">FIFA World Cup 2026</p>
+
+       {% set football_matches = [
+    {"league":"FIFA World Cup 2026 · Group J","date":"22 June, 20:00","date_val":"2026-06-22","time_val":"20:00","f1":"🇦🇷","t1":"Argentina","s1":"Captain: Lionel Messi | WR #1","f2":"🇦🇹","t2":"Austria","s2":"Captain: David Alaba","venue":"MetLife Stadium, New Jersey","cap":"82,500","fav":"Argentina (Defending Champions)","note":"Key clash in Group J","gk1":"Emiliano Martínez","gk2":"Patrick Pentz"},
+
+    {"league":"FIFA World Cup 2026 · Group I","date":"22 June, 23:00","date_val":"2026-06-22","time_val":"23:00","f1":"🇫🇷","t1":"France","s1":"Captain: Kylian Mbappé | WR #2","f2":"🇮🇶","t2":"Iraq","s2":"Captain: Bassem","venue":"AT&T Stadium, Texas","cap":"80,000","fav":"France","note":"A crucial match for Mbappé","gk1":"Mike Maignan","gk2":"Jalal Hassan"},
+
+    {"league":"FIFA World Cup 2026 · Group L","date":"23 June, 20:00","date_val":"2026-06-23","time_val":"20:00","f1":"🏴","t1":"England","s1":"Captain: Jude Bellingham","f2":"🇬🇭","t2":"Ghana","s2":"Captain: André Ayew","venue":"SoFi Stadium, Los Angeles","cap":"70,240","fav":"England","note":"Both teams are fighting for qualification","gk1":"Jordan Pickford","gk2":"Lawrence Ati Zigi"},
+
+    {"league":"FIFA World Cup 2026 · Group K","date":"23 June, 23:00","date_val":"2026-06-23","time_val":"23:00","f1":"🇵🇹","t1":"Portugal","s1":"Captain: Cristiano Ronaldo | 26 Apps","f2":"🇺🇿","t2":"Uzbekistan","s2":"First FIFA World Cup","venue":"Levi's Stadium, San Jose","cap":"68,500","fav":"Portugal (Odds: 1.08)","note":"Possibly Cristiano Ronaldo's final World Cup","gk1":"Diogo Costa","gk2":"Ulugbek Nishonov"},
+
+    {"league":"FIFA World Cup 2026 · Group C","date":"24 June, 20:00","date_val":"2026-06-24","time_val":"20:00","f1":"🇧🇷","t1":"Brazil","s1":"Captain: Vinícius Jr.","f2":"🏴","t2":"Scotland","s2":"Captain: Andrew Robertson","venue":"Rose Bowl, Pasadena","cap":"92,542","fav":"Brazil","note":"A must-win match for Brazil","gk1":"Alisson Becker","gk2":"Angus Gunn"}
+] %}
+        {% for m in football_matches %}
+        <div class="match-card">
+            <div class="match-header">
+                <span class="match-league">🏆 {{ m.league }}</span>
+                <span class="match-date-badge">📅 {{ m.date }}</span>
+            </div>
+            <div class="match-body">
+                <div class="teams-row">
+                    <div class="team-block">
+                        <div class="team-flag">{{ m.f1 }}</div>
+                        <div class="team-name-big">{{ m.t1 }}</div>
+                        <div class="team-sub">{{ m.s1 }}</div>
+                    </div>
+                    <div class="center-col">
+                        <div class="vs-label">VS</div>
+                        <div class="match-status">{{ t("sports_match_upcoming") }}</div>
+                    </div>
+                    <div class="team-block">
+                        <div class="team-flag">{{ m.f2 }}</div>
+                        <div class="team-name-big">{{ m.t2 }}</div>
+                        <div class="team-sub">{{ m.s2 }}</div>
+                    </div>
+                </div>
+                <div class="match-details">
+                    <div class="det"><span class="det-icon">📍</span><span class="det-lbl">{{ t("sports_label_st") }}&nbsp;</span><span class="det-val">{{ m.venue }}</span></div>
+                    <div class="det"><span class="det-icon">👥</span><span class="det-lbl">{{ t("sports_label_cap") }}&nbsp;</span><span class="det-val">{{ m.cap }}</span></div>
+                    <div class="det"><span class="det-icon">⭐</span><span class="det-lbl">{{ t("sports_label_fav") }}&nbsp;</span><span class="det-val">{{ m.fav }}</span></div>
+                    <div class="det"><span class="det-icon">🔑</span><span class="det-val">{{ m.note }}</span></div>
+                </div>
+                <div class="keepers-row">
+                    <div class="keeper-side"><div class="keeper-lbl">{{ t("sports_label_gk") }}</div><div class="keeper-name">{{ m.gk1 }}</div></div>
+                    <div class="keeper-side"><div class="keeper-lbl">{{ t("sports_label_gk") }}</div><div class="keeper-name">{{ m.gk2 }}</div></div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button class="btn-remind" onclick="openModal('⚽ {{ m.t1 }} vs {{ m.t2 }}','{{ m.date_val }}','{{ m.time_val }}','football')">{{ t("sports_btn_remind") }}</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+  
+    <div class="sport-section visible" id="sec-basketball">
+        <div class="section-head">
+            <span class="section-icon">🏀</span>
+            <span class="section-title">NBA Draft 2026</span>
+            <span class="section-date">24–25 June</span>
+        </div>
+        <div class="match-card">
+            <div class="match-header">
+                <span class="match-league">🏀 NBA Draft 2026 · Barclays Center, Brooklyn</span>
+                <span class="match-date-badge">📅 24 June, 21:00</span>
+            </div>
+            <div class="match-body">
+                <div class="match-details" style="margin-top:0;padding-top:0;border-top:none;margin-bottom:14px">
+                    <div class="det"><span class="det-icon">📍</span><span class="det-lbl">{{ t("sports_label_st") }}&nbsp;</span><span class="det-val">Barclays Center, New York</span></div>
+                    <div class="det"><span class="det-icon">👥</span><span class="det-lbl">{{ t("sports_label_cap") }}&nbsp;</span><span class="det-val">19,000</span></div>
+                    <div class="det"><span class="det-icon">🎓</span><span class="det-lbl">New:</span><span class="det-val">60 players, 2 rounds</span></div>
+                    <div class="det"><span class="det-icon">📺</span><span class="det-lbl">TV:&nbsp;</span><span class="det-val">ESPN / ABC</span></div>
+                </div>
+                <div style="font-size:0.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">🔝 TOP PROSPECTS</div>
+                {% for p in [("#1","Cooper Flagg","Duke · PF/SF · 202cm"),("#2","Dylan Harper","Rutgers · PG · 196cm"),("#3","Ace Bailey","Rutgers · SF · 206cm"),("#4","VJ Edgecombe","Baylor · SG · 193cm")] %}
+                <div style="display:flex;align-items:center;gap:10px;font-size:0.83rem;padding:6px 10px;background:var(--card2);border-radius:8px;border:1px solid var(--border);margin-bottom:5px">
+                    <span style="color:var(--accent2);font-weight:800;min-width:24px">{{ p[0] }}</span>
+                    <span style="font-weight:700">{{ p[1] }}</span>
+                    <span style="color:var(--muted)">{{ p[2] }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="card-footer">
+                <button class="btn-remind" onclick="openModal('🏀 NBA Draft 2026','2026-06-24','21:00','basketball')">{{ t("sports_btn_remind") }}</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="sport-section visible" id="sec-boxing">
+        <div class="section-head">
+            <span class="section-icon">🥊</span>
+            <span class="section-title">Boxing</span>
+            <span class="section-date">27–28 June</span>
+        </div>
+
+       {% set fights = [
+    {"title":"Super Flyweight · WBC + WBO + WBA Title Fight","date":"27 June, 23:00","date_val":"2026-06-27","time_val":"23:00","e1":"🥊","flag1":"🇲🇽","name1":"Jesse Rodriguez","nick1":"Bam","rec1":"19-0 (11 KO)","e2":"🥊","flag2":"🇦🇷","name2":"Fernando Martinez","nick2":"Puma","rec2":"17-1 (9 KO)","venue":"T-Mobile Arena, Las Vegas","weight":"115 lbs / 52 kg","rounds":"12 × 3 min","fav":"Rodriguez (-1200)","tv":"DAZN PPV","cap":"20,000"},
+
+    {"title":"Cruiserweight · Ranking Bout","date":"28 June, 22:00","date_val":"2026-06-28","time_val":"22:00","e1":"🎬","flag1":"🇺🇸","name1":"Jake Paul","nick1":"The Problem Child","rec1":"12-1 (9 KO)","e2":"🥊","flag2":"🇲🇽","name2":"J.C. Chávez Jr.","nick2":"El Hijo del Campeón","rec2":"54-5-1 (34 KO)","venue":"Crypto.com Arena, Los Angeles","weight":"200 lbs / 90 kg","rounds":"10 × 3 min","fav":"Paul (-350)","tv":"Most Valuable Promotions","cap":"19,000"}
+] %}
+        {% for f in fights %}
+        <div class="fight-card">
+            <div class="fight-header">
+                <span class="fight-title">🥊 {{ f.title }}</span>
+                <span class="fight-date">📅 {{ f.date }}</span>
+            </div>
+            <div class="fight-body">
+                <div class="fighters-row">
+                    <div class="fighter-block">
+                        <div class="fighter-emoji">{{ f.e1 }}</div>
+                        <div class="fighter-flag">{{ f.flag1 }}</div>
+                        <div class="fighter-name">{{ f.name1 }}</div>
+                        <div class="fighter-nick">"{{ f.nick1 }}"</div>
+                        <div class="fighter-rec">{{ f.rec1 }}</div>
+                    </div>
+                    <div class="vs-center"><div class="vs-big">VS.</div><div style="font-size:1.2rem">🏆</div></div>
+                    <div class="fighter-block">
+                        <div class="fighter-emoji">{{ f.e2 }}</div>
+                        <div class="fighter-flag">{{ f.flag2 }}</div>
+                        <div class="fighter-name">{{ f.name2 }}</div>
+                        <div class="fighter-nick">"{{ f.nick2 }}"</div>
+                        <div class="fighter-rec">{{ f.rec2 }}</div>
+                    </div>
+                </div>
+                <div class="fight-details">
+                    <div class="fd-box"><div class="fd-lbl">📍 place</div><div class="fd-val" style="font-size:0.72rem">{{ f.venue }}</div></div>
+                    <div class="fd-box"><div class="fd-lbl">⚖️ weight</div><div class="fd-val">{{ f.weight }}</div></div>
+                    <div class="fd-box"><div class="fd-lbl">🔢 round</div><div class="fd-val">{{ f.rounds }}</div></div>
+                    <div class="fd-box"><div class="fd-lbl">🎯 favorite</div><div class="fd-val">{{ f.fav }}</div></div>
+                    <div class="fd-box"><div class="fd-lbl">📺 TV</div><div class="fd-val">{{ f.tv }}</div></div>
+                    <div class="fd-box"><div class="fd-lbl">👥 Capacity</div><div class="fd-val">{{ f.cap }}</div></div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button class="btn-remind" onclick="openModal('🥊 {{ f.name1 }} vs {{ f.name2 }}','{{ f.date_val }}','{{ f.time_val }}','boxing')">{{ t("sports_btn_remind") }}</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+  
+    <div class="sport-section visible" id="sec-mma">
+        <div class="section-head">
+            <span class="section-icon">🥋</span>
+            <span class="section-title">UFC 317</span>
+            <span class="section-date">28 June, Miami</span>
+        </div>
+
+       {% set ufc_fights = [
+    {"title":"Lightweight Championship — MAIN EVENT","date":"29 Jun, 05:00 (GEO)","date_val":"2026-06-28","time_val":"23:00","e1":"🇬🇪","flag1":"🇬🇪","name1":"Ilia Topuria","nick1":"El Matador","rec1":"15-0 (13 KO/TKO)","e2":"🇧🇷","flag2":"🇧🇷","name2":"Charles Oliveira","nick2":"Do Bronx","rec2":"34-9 (21 Sub)","venue":"Kaseya Center, Miami","weight":"155 lbs / 70 kg","rounds":"5 × 5 min","fav":"Topuria (-175)","tv":"ESPN PPV","cap":"21,000"},
+
+    {"title":"Flyweight Championship — CO-MAIN EVENT","date":"29 Jun, 04:00 (GEO)","date_val":"2026-06-28","time_val":"22:00","e1":"🇧🇷","flag1":"🇧🇷","name1":"Alexandre Pantoja","nick1":"The Cannibal","rec1":"28-5 (9 Sub)","e2":"🇳🇿","flag2":"🇳🇿","name2":"Kai Kara-France","nick2":"Don't Blink","rec2":"25-10 (13 KO)","venue":"Kaseya Center, Miami","weight":"125 lbs / 57 kg","rounds":"5 × 5 min","fav":"Pantoja (-400)","tv":"ESPN PPV","cap":"21,000"}
+] %}
+        {% for f in ufc_fights %}
+        <div class="fight-card">
+            <div class="fight-header">
+                <span class="fight-title">🥋 UFC 317 · {{ f.title }}</span>
+                <span class="fight-date">📅 {{ f.date }}</span>
+            </div>
+            <div class="fight-body">
+                <div class="fighters-row">
+                    <div class="fighter-block">
+                        <div class="fighter-emoji" style="font-size:2.6rem">{{ f.e1 }}</div>
+                        <div class="fighter-flag">{{ f.flag1 }}</div>
+                        <div class="fighter-name">{{ f.name1 }}</div>
+                        <div class="fighter-nick">"{{ f.nick1 }}"</div>
+                        <div class="fighter-rec">{{ f.rec1 }}</div>
+                    </div>
+                    <div class="vs-center"><div class="vs-big">VS.</div><div style="font-size:1.1rem">🏆</div></div>
+                    <div class="fighter-block">
+                        <div class="fighter-emoji" style="font-size:2.6rem">{{ f.e2 }}</div>
+                        <div class="fighter-flag">{{ f.flag2 }}</div>
+                        <div class="fighter-name">{{ f.name2 }}</div>
+                        <div class="fighter-nick">"{{ f.nick2 }}"</div>
+                        <div class="fighter-rec">{{ f.rec2 }}</div>
+                    </div>
+                </div>
+                <div class="fight-details">
+                    <div class="fd-box"><div class="fd-lbl">📍</div><div class="fd-val" style="font-size:0.72rem">{{ f.venue }}</div></div>
+                    <div class="fd-box"><div class="fd-lbl">⚖️</div><div class="fd-val">{{ f.weight }}</div></div>
+                    <div class="fd-box"><div class="fd-lbl">🔢</div><div class="fd-val">{{ f.rounds }}</div></div>
+                    <div class="fd-box"><div class="fd-lbl">🎯 favorite</div><div class="fd-val">{{ f.fav }}</div></div>
+                    <div class="fd-box"><div class="fd-lbl">📺</div><div class="fd-val">{{ f.tv }}</div></div>
+                    <div class="fd-box"><div class="fd-lbl">👥</div><div class="fd-val">{{ f.cap }}</div></div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button class="btn-remind" onclick="openModal('🥋 {{ f.name1 }} vs {{ f.name2 }}','{{ f.date_val }}','{{ f.time_val }}','mma')">{{ t("sports_btn_remind") }}</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    
+    <div class="sport-section visible" id="sec-tennis">
+        <div class="section-head">
+            <span class="section-icon">🎾</span>
+            <span class="section-title">Wimbledon 2026</span>
+            <span class="section-date">29 June – 13 July</span>
+        </div>
+        <div class="match-card">
+            <div class="match-header">
+                <span class="match-league">🏆 Wimbledon 2026 · All England Club, London</span>
+                <span class="match-date-badge">📅 29 June</span>
+            </div>
+            <div class="match-body">
+                <div class="match-details" style="margin-top:0;padding-top:0;border-top:none;margin-bottom:14px">
+    <div class="det"><span class="det-icon">🌿</span><span class="det-lbl">Surface:&nbsp;</span><span class="det-val">Grass</span></div>
+    <div class="det"><span class="det-icon">💰</span><span class="det-lbl">Prize:&nbsp;</span><span class="det-val">£50 m</span></div>
+    <div class="det"><span class="det-icon">📍</span><span class="det-lbl">Venue:&nbsp;</span><span class="det-val">All England Club, London</span></div>
+    <div class="det"><span class="det-icon">🏆</span><span class="det-lbl">Grand Slam:&nbsp;</span><span class="det-val">3rd (of 4)</span></div>
+</div>
+                <div style="font-size:0.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">🔝 favorites</div>
+                {% for p in [("🇪🇸","Carlos Alcaraz","WR #2 · Wimbledon champ. 2023, 2024","-220"),("🇮🇹","Jannik Sinner","WR #1 · Australian Open champ. 2024, 2025","+180"),("🇷🇸","Novak Djokovic","7× Wimbledon Champ. · legend","+450"),("🇩🇪","Alexander Zverev","WR #3 · Rating","+600")] %}
+                <div class="player-row">
+                    <span class="p-flag">{{ p[0] }}</span>
+                    <div class="p-info"><div class="p-name">{{ p[1] }}</div><div class="p-rank">{{ p[2] }}</div></div>
+                    <div class="p-odds">{{ p[3] }}</div>
+                </div>
+                {% endfor %}
+            </div>
+           <div class="card-footer">
+    <button class="btn-remind" onclick="openModal('🎾 Wimbledon 2026 — Start','2026-06-29','13:00','tennis')">
+        {{ t("sports_btn_remind") }}
+    </button>
+</div>
+</div>
+</div>
+
+<!-- ══ RUGBY ══ -->
+<div class="sport-section visible" id="sec-rugby">
+    <div class="section-head">
+        <span class="section-icon">🏉</span>
+        <span class="section-title">Rugby — July Test Matches</span>
+        <span class="section-date">5–12 July</span>
+    </div>
+
+    {% set rugby_matches = [
+        {"league":"Test Series — All Blacks vs France (1)","date":"5 July, 11:00","date_val":"2026-07-05","time_val":"11:00","f1":"🇳🇿","t1":"New Zealand","s1":"All Blacks · WR #3","f2":"🇫🇷","t2":"France","s2":"Les Bleus · WR #4","venue":"Eden Park, Auckland","cap":"50,000","fav":"All Blacks (home advantage)","note":"2 × 40 min · 15 players per team","gk1":"Beauden Barrett","gk2":"Romain Ntamack"},
+
+        {"league":"Test Series — Springboks vs Ireland (1)","date":"6 July, 17:00","date_val":"2026-07-06","time_val":"17:00","f1":"🇿🇦","t1":"South Africa","s1":"Springboks · WR #1","f2":"🇮🇪","t2":"Ireland","s2":"WR #2","venue":"Ellis Park, Johannesburg","cap":"62,000","fav":"Springboks (home advantage)","note":"World Champions vs WR #2","gk1":"Handré Pollard","gk2":"Johnny Sexton"},
+
+        {"league":"Test Series — Australia vs England (1)","date":"12 July, 11:30","date_val":"2026-07-12","time_val":"11:30","f1":"🇦🇺","t1":"Australia","s1":"Wallabies · WR #6","f2":"🏴","t2":"England","s2":"WR #5","venue":"Stadium Australia, Sydney","cap":"83,500","fav":"England (-110)","note":"Classic Commonwealth rivalry","gk1":"Bernard Foley","gk2":"Marcus Smith"}
+    ] %}
+
+    {% for m in rugby_matches %}
+    <div class="match-card">
+        <div class="match-header">
+            <span class="match-league">🏉 {{ m.league }}</span>
+            <span class="match-date-badge">📅 {{ m.date }}</span>
+        </div>
+            <div class="match-body">
+                <div class="teams-row">
+                    <div class="team-block">
+                        <div class="team-flag">{{ m.f1 }}</div>
+                        <div class="team-name-big">{{ m.t1 }}</div>
+                        <div class="team-sub">{{ m.s1 }}</div>
+                    </div>
+                    <div class="center-col">
+                        <div class="vs-label">VS</div>
+                        <div class="match-status">{{ t("sports_match_testmatch") }}</div>
+                    </div>
+                    <div class="team-block">
+                        <div class="team-flag">{{ m.f2 }}</div>
+                        <div class="team-name-big">{{ m.t2 }}</div>
+                        <div class="team-sub">{{ m.s2 }}</div>
+                    </div>
+                </div>
+                <div class="match-details">
+                    <div class="det"><span class="det-icon">📍</span><span class="det-lbl">{{ t("sports_label_st") }}&nbsp;</span><span class="det-val">{{ m.venue }}</span></div>
+                    <div class="det"><span class="det-icon">👥</span><span class="det-lbl">{{ t("sports_label_cap") }}&nbsp;</span><span class="det-val">{{ m.cap }}</span></div>
+                    <div class="det"><span class="det-icon">⭐</span><span class="det-lbl">{{ t("sports_label_fav") }}&nbsp;</span><span class="det-val">{{ m.fav }}</span></div>
+                    <div class="det"><span class="det-icon">⏱️</span><span class="det-val">{{ m.note }}</span></div>
+                </div>
+                <div class="keepers-row">
+                    <div class="keeper-side"><div class="keeper-lbl">{{ t("sports_label_sniper") }}</div><div class="keeper-name">{{ m.gk1 }}</div></div>
+                    <div class="keeper-side"><div class="keeper-lbl">{{ t("sports_label_sniper") }}</div><div class="keeper-name">{{ m.gk2 }}</div></div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button class="btn-remind" onclick="openModal('🏉 {{ m.t1 }} vs {{ m.t2 }}','{{ m.date_val }}','{{ m.time_val }}','rugby')">{{ t("sports_btn_remind") }}</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal-box">
+        <button type="button" class="modal-close" onclick="closeModal()">×</button>
+        <h3>{{ t("sports_modal_h3") }}</h3>
+        <p id="modalDesc"></p>
+        <form action="/sports/remind" method="POST">
+            <input type="hidden" name="sport_type" id="remindSportType" value="other">
+            <div class="form-group">
+                <label>{{ t("sports_modal_title_lbl") }}</label>
+                <input type="text" name="title" id="remindTitle" required>
+            </div>
+            <div class="form-group">
+                <label>{{ t("sports_modal_date_lbl") }}</label>
+                <input type="date" name="event_date" id="remindDate" required>
+            </div>
+            <div class="form-group">
+                <label>{{ t("sports_modal_time_lbl") }}</label>
+                <input type="time" name="event_time" id="remindTime">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">{{ t("sports_modal_cancel") }}</button>
+                <button type="submit" class="btn btn-primary">{{ t("sports_modal_add") }}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showSport(key, btn) {
+    document.querySelectorAll('.sport-filters .chip').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.sport-section').forEach(s => s.classList.remove('visible'));
+    if (key === 'all') {
+        document.querySelectorAll('.sport-section').forEach(s => s.classList.add('visible'));
+    } else {
+        const sec = document.getElementById('sec-' + key);
+        if (sec) sec.classList.add('visible');
+    }
+}
+
+function openModal(title, date, time, sport_type) {
+    document.getElementById("remindSportType").value = sport_type || "other";
+    document.getElementById('remindTitle').value = title.replace(/^[^\w]+/, '').trim();
+    document.getElementById('remindDate').value = date;
+    document.getElementById('remindTime').value = time;
+    document.getElementById('modalDesc').textContent = title.replace(/^[^\w]+/, '').trim();
+    document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+if (new URLSearchParams(window.location.search).get('reminded')) {
+    const toast = document.getElementById('toastMsg');
+    if (toast) { toast.style.display = 'block'; setTimeout(() => toast.style.display = 'none', 4000); }
+}
+</script>
+{% endblock %}

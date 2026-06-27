@@ -1,0 +1,50 @@
+/* ── Language Switcher ─────────────────────────────────────────────────────── */
+.lang-switcher {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
+}
+
+.lang-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-decoration: none;
+    color: var(--muted, #888);
+    border: 1px solid var(--border, #ddd);
+    background: transparent;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    line-height: 1;
+}
+
+.lang-btn:hover {
+    background: var(--accent, #7c3aed);
+    color: #fff;
+    border-color: var(--accent, #7c3aed);
+}
+
+.lang-btn.active {
+    background: var(--accent, #7c3aed);
+    color: #fff;
+    border-color: var(--accent, #7c3aed);
+}
+
+/* Public pages (login / register) — fixed position bottom-right */
+.lang-public {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 999;
+    background: var(--bg, #fff);
+    border: 1px solid var(--border, #ddd);
+    border-radius: 10px;
+    padding: 6px 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.1);
+    margin: 0;
+}

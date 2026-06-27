@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t("index_title") }}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='public.css') }}">
+</head>
+<body class="public-body">
+
+<nav class="site-nav">
+    <a href="/" class="site-logo">Remind<em>Me</em></a>
+
+    <div class="site-nav-links">
+        <a href="/login">{{ t("nav_login") }}</a>
+        <a href="/register" class="btn-warm">{{ t("nav_start") }}</a>
+    </div>
+
+    <div class="lang-switcher">
+        {% for code in supported_langs %}
+        <a href="/lang/{{ code }}"
+           class="lang-btn {% if current_lang == code %}active{% endif %}">
+            {{ code.upper() }}
+        </a>
+        {% endfor %}
+    </div>
+</nav>
+
+<section class="hero-home">
+    <div class="hero-copy">
+        <h1>{{ t("index_hero_h1") }}</h1>
+        <p>{{ t("index_hero_p") }}</p>
+
+        <div class="hero-actions">
+            <a href="/register" class="btn-warm">{{ t("index_cta_main") }}</a>
+            <a href="/login" class="btn-soft">{{ t("nav_login") }}</a>
+        </div>
+
+        <p class="hero-note">{{ t("index_free_note") }}</p>
+    </div>
+
+    <div class="hero-visual">
+        <img
+            class="hero-photo"
+            src="{{ url_for('static', filename='images/landing/hero-main.jpg') }}"
+            alt="A person is taking notes in a notebook."
+            loading="eager">
+
+        <img
+            class="hero-photo-small"
+            src="{{ url_for('static', filename='images/landing/hero-coffee.jpg') }}"
+            alt="Coffee and planning"
+            loading="lazy">
+    </div>
+</section>
+
+<section class="story-section">
+    <div class="story-inner">
+
+        <div class="story-intro">
+            <h2>{{ t("index_why_h2") }}</h2>
+            <p>{{ t("index_why_p") }}</p>
+        </div>
+
+        <div class="story-grid">
+
+            <article class="story-card">
+                <img
+                    src="{{ url_for('static', filename='images/landing/story-calendar.jpg') }}"
+                    alt="Calendar and planning"
+                    loading="lazy">
+
+                <h3>{{ t("index_card1_h3") }}</h3>
+                <p>{{ t("index_card1_p") }}</p>
+            </article>
+
+            <article class="story-card">
+                <img
+                    src="{{ url_for('static', filename='images/landing/story-celebration.jpg') }}"
+                    alt="Birthday celebration"
+                    loading="lazy">
+
+                <h3>{{ t("index_card2_h3") }}</h3>
+                <p>{{ t("index_card2_p") }}</p>
+            </article>
+
+            <article class="story-card">
+                <img
+                    src="{{ url_for('static', filename='images/landing/story-football.jpg') }}"
+                    alt="Stadium and sports match"
+                    loading="lazy">
+
+                <h3>{{ t("index_card3_h3") }}</h3>
+                <p>{{ t("index_card3_p") }}</p>
+            </article>
+
+        </div>
+    </div>
+</section>
+
+<div class="cta-photo">
+    <img
+        src="{{ url_for('static', filename='images/landing/cta-desk.jpg') }}"
+        alt="Desk"
+        loading="lazy">
+
+    <div class="cta-photo-content">
+        <h2>{{ t("index_cta2_h2") }}</h2>
+        <p>{{ t("index_cta2_p") }}</p>
+
+        <a href="/register" class="btn-warm">
+            {{ t("index_register") }}
+        </a>
+    </div>
+</div>
+
+<footer class="site-footer">
+    {{ t("index_footer") }}
+</footer>
+
+</body>
+</html>

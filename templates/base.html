@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}RemindMe{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+{% block body %}
+<nav class="app-nav">
+    <a href="/reminders" class="logo">Remind<strong>Me</strong></a>
+    <div class="nav-links">
+        <a href="/reminders" class="nav-link {% if active_page == 'reminders' %}active{% endif %}">{{ t("nav_reminders") }}</a>
+        <a href="/calendar" class="nav-link {% if active_page == 'calendar' %}active{% endif %}">{{ t("nav_calendar") }}</a>
+        <a href="/holidays" class="nav-link {% if active_page == 'holidays' %}active{% endif %}">{{ t("nav_holidays") }}</a>
+        <a href="/sports" class="nav-link {% if active_page == 'sports' %}active{% endif %}">{{ t("nav_sports") }}</a>
+    </div>
+    <div class="nav-actions">
+        <button type="button" class="theme-btn" id="themeToggle" title="{{ t('theme_toggle') }}">◐</button>
+        <a href="/profile" class="nav-link {% if active_page == 'profile' %}active{% endif %}">{{ t("nav_profile") }}</a>
+        <a href="/logout" class="nav-link danger">{{ t("nav_logout") }}</a>
+    </div>
+
+    <div class="lang-switcher">
+        {% for code in supported_langs %}
+        <a href="/lang/{{ code }}"
+           class="lang-btn {% if current_lang == code %}active{% endif %}"
+           title="{{ lang_names[code] }}">{{ code.upper() }}</a>
+        {% endfor %}
+    </div>
+</nav>
+
+<div class="page {% block page_class %}{% endblock %}">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</div>
+{% endblock %}
+
+<script>
+(function() {
+    const saved = localStorage.getItem('theme') || '{{ user_theme|default("light") }}';
+    const normalized = ['dark', 'blue', 'green'].includes(saved) ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', normalized);
+
+    const btn = document.getElementById('themeToggle');
+    if (btn) {
+        btn.addEventListener('click', () => {
+            const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            fetch('/theme', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({theme: next})
+            });
+        });
+    }
+})();
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

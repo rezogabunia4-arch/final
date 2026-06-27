@@ -1,0 +1,135 @@
+.sport-filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+.sport-filters .chip { cursor: pointer; border: none; font-family: inherit; }
+
+.sport-section { display: none; }
+.sport-section.visible { display: block; margin-bottom: 32px; }
+
+.sport-section h2 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text);
+}
+
+.sport-section .sub {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin: -8px 0 12px;
+}
+
+.event-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm, 10px);
+    padding: 18px 20px;
+    margin-bottom: 10px;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.event-card:hover {
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+}
+
+.event-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.event-card-title { font-size: 0.9375rem; font-weight: 600; }
+.event-card-league { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+.event-card-date { font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
+
+.matchup {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.team { flex: 1; text-align: center; }
+.team-name { font-size: 0.875rem; font-weight: 600; }
+.team-sub { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+.vs { font-size: 0.75rem; font-weight: 600; color: var(--muted); }
+
+.event-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 12px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-bottom: 12px;
+}
+
+.event-meta strong { color: var(--text); font-weight: 500; }
+
+.event-card-foot { display: flex; justify-content: flex-end; }
+
+/* legacy class aliases — compact layout */
+.match-card, .fight-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; padding: 14px 16px; }
+.match-header, .fight-header { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; font-size: 0.75rem; color: var(--muted); }
+.match-league, .fight-title { font-weight: 500; }
+.match-date-badge, .fight-date { white-space: nowrap; }
+.teams-row, .fighters-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.team-block, .fighter-block { flex: 1; text-align: center; }
+.team-flag, .fighter-emoji { font-size: 1.5rem; line-height: 1; }
+.team-name-big, .fighter-name { font-size: 0.875rem; font-weight: 600; }
+.team-sub, .fighter-nick, .fighter-rec { font-size: 0.75rem; color: var(--muted); }
+.center-col, .vs-center { text-align: center; font-size: 0.75rem; color: var(--muted); font-weight: 600; }
+.vs-label, .vs-big { font-size: 0.8125rem; }
+.match-details, .fight-details { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; font-size: 0.75rem; color: var(--muted); margin-bottom: 10px; }
+.det-val, .fd-val { color: var(--text); font-weight: 500; }
+.keepers-row { display: none; }
+.card-footer { display: flex; justify-content: flex-end; margin-top: 8px; }
+.btn-remind { padding: 6px 12px; font-size: 0.8125rem; font-weight: 500; border: 1px solid var(--border); border-radius: 6px; background: transparent; color: var(--accent); cursor: pointer; font-family: inherit; }
+.btn-remind:hover { background: var(--subtle); }
+.section-head { margin-bottom: 12px; }
+.section-title { font-size: 0.875rem; font-weight: 600; }
+.section-date, .section-icon { font-size: 0.75rem; color: var(--muted); }
+.player-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.8125rem; }
+.player-row:last-child { border-bottom: none; }
+.p-rank { font-size: 0.75rem; color: var(--muted); }
+.p-odds { margin-left: auto; color: var(--muted); }
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+
+.modal-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+}
+
+.modal-box h3 { font-size: 1rem; font-weight: 600; margin-bottom: 4px; }
+.modal-box p { font-size: 0.8125rem; color: var(--muted); margin-bottom: 16px; }
+.modal-close {
+    position: absolute;
+    top: 12px; right: 14px;
+    background: none; border: none;
+    color: var(--muted); cursor: pointer; font-size: 1.1rem;
+}
+.modal-box .form-group { margin-bottom: 12px; }
+.modal-actions { display: flex; gap: 8px; margin-top: 4px; }
+.modal-actions .btn { flex: 1; }
+
+@media (max-width: 600px) {
+    .event-meta { grid-template-columns: 1fr; }
+    .matchup { flex-direction: column; gap: 6px; }
+    .vs { order: -1; }
+}

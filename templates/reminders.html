@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% block title %}{{ t("rem_title") }} — RemindMe{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ t("rem_title") }}</h1>
+    <p>
+        {% if pending_count %}{{ pending_count }} {{ t("rem_active_count") }}{% endif %}
+        {% if overdue_count %} · {{ overdue_count }} {{ t("rem_overdue_count") }}{% endif %}
+        {% if not pending_count and not overdue_count %}{{ t("rem_all_good") }}{% endif %}
+    </p>
+</div>
+
+<div class="banner" id="notifBanner">
+    <span>{{ t("rem_notif_banner") }}</span>
+    <button type="button" class="btn btn-primary btn-sm" onclick="enableNotifications()">{{ t("rem_notif_enable") }}</button>
+</div>
+
+<div class="layout-2col">
+    <div>
+        <div class="card card-pad" style="margin-bottom:20px;">
+            <div class="card-title">{{ t("rem_add_title") }}</div>
+            <form action="/reminders" method="POST">
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label for="titleInput">{{ t("rem_label_title") }}</label>
+                        <input type="text" name="title" id="titleInput" placeholder="{{ t('rem_placeholder_title') }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>{{ t("rem_label_category") }}</label>
+                        <select name="category">
+                            <option value="Personal">{{ t("cat_personal") }}</option>
+                            <option value="School">{{ t("cat_school") }}</option>
+                            <option value="Work">{{ t("cat_work") }}</option>
+                            <option value="Sports">{{ t("cat_sports") }}</option>
+                            <option value="Health">{{ t("cat_health") }}</option>
+                            <option value="Other">{{ t("cat_other") }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="timeInput">{{ t("rem_label_time") }}</label>
+                        <input type="datetime-local" name="time" id="timeInput" required>
+                    </div>
+                    <div class="form-group full">
+                        <label>{{ t("rem_label_desc") }}</label>
+                        <input type="text" name="description" placeholder="{{ t('rem_placeholder_desc') }}">
+                    </div>
+                    <div class="form-group">
+                        <label>{{ t("rem_label_repeat") }}</label>
+                        <select name="repeat">
+                            <option value="none">{{ t("rem_repeat_none") }}</option>
+                            <option value="daily">{{ t("rem_repeat_daily") }}</option>
+                            <option value="weekly">{{ t("rem_repeat_weekly") }}</option>
+                            <option value="monthly">{{ t("rem_repeat_monthly") }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="align-self:end;">
+                        <button type="submit" class="btn btn-primary btn-block">{{ t("rem_btn_add") }}</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="tabs">
+            <a href="{{ url_for('reminders', status='active', category=filter_cat if filter_cat != 'all' else None) }}" class="tab {% if status == 'active' %}active{% endif %}">{{ t("rem_tab_active") }}</a>
+            <a href="{{ url_for('reminders', status='done', category=filter_cat if filter_cat != 'all' else None) }}" class="tab {% if status == 'done' %}active{% endif %}">{{ t("rem_tab_done") }}</a>
+            <a href="{{ url_for('reminders', status='all', category=filter_cat if filter_cat != 'all' else None) }}" class="tab {% if status == 'all' %}active{% endif %}">{{ t("rem_tab_all") }}</a>
+        </div>
+
+        <div class="chips">
+            <a href="{{ url_for('reminders', status=status) }}" class="chip {% if filter_cat == 'all' or not filter_cat %}active{% endif %}">{{ t("cat_all") }}</a>
+            <a href="{{ url_for('reminders', status=status, category='Personal') }}" class="chip {% if filter_cat == 'Personal' %}active{% endif %}">{{ t("cat_personal") }}</a>
+            <a href="{{ url_for('reminders', status=status, category='School') }}" class="chip {% if filter_cat == 'School' %}active{% endif %}">{{ t("cat_school") }}</a>
+            <a href="{{ url_for('reminders', status=status, category='Work') }}" class="chip {% if filter_cat == 'Work' %}active{% endif %}">{{ t("cat_work") }}</a>
+            <a href="{{ url_for('reminders', status=status, category='Sports') }}" class="chip {% if filter_cat == 'Sports' %}active{% endif %}">{{ t("cat_sports") }}</a>
+            <a href="{{ url_for('reminders', status=status, category='Health') }}" class="chip {% if filter_cat == 'Health' %}active{% endif %}">{{ t("cat_health") }}</a>
+            <a href="{{ url_for('reminders', status=status, category='Other') }}" class="chip {% if filter_cat == 'Other' %}active{% endif %}">{{ t("cat_other") }}</a>
+        </div>
+
+        <div class="list-header">
+            <h2>{{ t("rem_list_header") }}</h2>
+            <span class="count">{{ reminders|length }}</span>
+        </div>
+
+        {% if reminders %}
+            {% for reminder in reminders %}
+            <div class="item {% if reminder.completed %}done{% elif reminder.remind_time < now %}overdue{% elif (reminder.remind_time - now).total_seconds() < 86400 %}soon{% endif %}">
+                <div class="item-body">
+                    <div class="item-title">{{ reminder.title }}</div>
+                    {% if reminder.description %}
+                    <div class="item-meta">{{ reminder.description }}</div>
+                    {% endif %}
+                    <div class="item-meta">{{ reminder.remind_time.strftime('%d %b %Y, %H:%M') }}</div>
+                    <div class="item-tags">
+                        <span class="tag">{{ reminder.category }}</span>
+                        {% if reminder.repeat != 'none' %}
+                        <span class="tag">{{ {'daily': t('rem_repeat_daily'), 'weekly': t('rem_repeat_weekly'), 'monthly': t('rem_repeat_monthly')}[reminder.repeat] }}</span>
+                        {% endif %}
+                        {% if reminder.completed %}
+                        <span class="tag success">{{ t("rem_status_done") }}</span>
+                        {% elif reminder.remind_time < now %}
+                        <span class="tag warning">{{ t("rem_status_overdue") }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="item-actions">
+                    {% if not reminder.completed %}
+                    <a href="/complete/{{ reminder.id }}" class="btn btn-success-ghost btn-sm">{{ t('rem_btn_complete') }}</a>
+                    {% endif %}
+                    <a href="/delete/{{ reminder.id }}" class="btn btn-danger-ghost btn-sm">{{ t("rem_btn_delete") }}</a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty card card-pad">
+                <h3>{{ t("rem_empty_h3") }}</h3>
+                <p>{{ t("rem_empty_p") }}</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <aside>
+        <div class="card card-pad sidebar-card">
+            <h3>{{ t("rem_sidebar_upcoming") }}</h3>
+            {% if upcoming_summary %}
+                {% for item in upcoming_summary %}
+                <a href="{{ item.url }}" class="sidebar-item">
+                    <div class="sidebar-item-title">{{ item.title }}</div>
+                    <div class="sidebar-item-date">
+                        {{ item.kind }} ·
+                        {% if item.days_left == 0 %}{{ t("days_today") }}
+                        {% elif item.days_left == 1 %}{{ t("days_tomorrow") }}
+                        {% else %}{{ t("days_in", n=item.days_left) }}{% endif %}
+                    </div>
+                </a>
+                {% endfor %}
+            {% else %}
+                <p style="font-size:0.8125rem;color:var(--muted);">{{ t("rem_sidebar_empty") }}</p>
+            {% endif %}
+        </div>
+
+        <div class="card card-pad sidebar-card">
+            <h3>{{ t("rem_sidebar_links") }}</h3>
+            <a href="/calendar" class="sidebar-item"><div class="sidebar-item-title">{{ t("nav_calendar") }}</div></a>
+            <a href="/holidays" class="sidebar-item"><div class="sidebar-item-title">{{ t("nav_holidays") }}</div></a>
+            <a href="/sports" class="sidebar-item"><div class="sidebar-item-title">{{ t("nav_sports") }}</div></a>
+            <a href="/profile" class="sidebar-item"><div class="sidebar-item-title">{{ t("nav_profile") }}</div></a>
+        </div>
+    </aside>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function enableNotifications() {
+    if (!("Notification" in window)) { alert("Browser not supported"); return; }
+    const p = await Notification.requestPermission();
+    if (p === "granted") {
+        document.getElementById("notifBanner").style.display = "none";
+        new Notification("RemindMe", { body: "Notifications are on." });
+        startChecking();
+    }
+}
+
+const reminderData = [{% for r in reminders if not r.completed %}{title:{{ r.title|tojson }},desc:{{ r.description|tojson }},time:new Date("{{ r.remind_time.strftime('%Y-%m-%dT%H:%M:00') }}")}{% if not loop.last %},{% endif %}{% endfor %}];
+const notified = new Set();
+
+function startChecking() { checkRem(); setInterval(checkRem, 30000); }
+function checkRem() {
+    const now = new Date();
+    reminderData.forEach((r, i) => {
+        const diff = r.time - now;
+        if (diff >= 0 && diff <= 60000 && !notified.has(i)) {
+            notified.add(i);
+            new Notification("Reminder: " + r.title, { body: r.desc || "Reminder time" });
+        }
+    });
+}
+
+if (Notification.permission === "granted") {
+    document.getElementById("notifBanner").style.display = "none";
+    startChecking();
+} else if (Notification.permission === "denied") {
+    document.getElementById("notifBanner").style.display = "none";
+}
+
+const timeInput = document.getElementById("timeInput");
+if (timeInput && !timeInput.value) {
+    const d = new Date();
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    timeInput.value = d.toISOString().slice(0, 16);
+}
+</script>
+{% endblock %}

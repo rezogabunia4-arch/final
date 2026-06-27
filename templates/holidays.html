@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}{{ t("hol_title") }} — RemindMe{% endblock %}
+{% block page_class %}page-narrow{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ t("hol_title") }}</h1>
+    <p>{{ t("hol_subtitle") }}</p>
+</div>
+
+<div class="card card-pad" style="margin-bottom:24px;">
+    <div class="card-title">{{ t("hol_add_title") }}</div>
+    <form action="/holidays" method="POST">
+        <div class="form-grid">
+            <div class="form-group full">
+                <label>{{ t("hol_label_title") }}</label>
+                <input type="text" name="title" placeholder="............" required>
+            </div>
+            <div class="form-group">
+                <label>{{ t("hol_label_date") }}</label>
+                <input type="date" name="event_date" required>
+            </div>
+            <div class="form-group">
+                <label>{{ t("hol_label_time") }}</label>
+                <input type="time" name="event_time">
+            </div>
+            <div class="form-group full">
+                <label>{{ t("hol_label_note") }}</label>
+                <input type="text" name="note" placeholder="...">
+            </div>
+            <div class="form-group full">
+                <label class="checkbox-row"><input type="checkbox" name="repeat_yearly" checked> {{ t("hol_repeat_yearly") }}</label>
+            </div>
+            <div class="form-group full">
+                <label class="checkbox-row"><input type="checkbox" name="remind_before"> {{ t("hol_remind_before") }}</label>
+            </div>
+            <div class="form-group full">
+                <button type="submit" class="btn btn-primary">{{ t("hol_btn_add") }}</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% if upcoming %}
+    {% for item in upcoming %}
+    <div class="item {% if item.days_left == 0 or item.days_left <= 7 %}soon{% endif %}">
+        <div class="item-body">
+            <div class="item-title">{{ item.holiday.title }}</div>
+            <div class="item-meta">
+                {{ item.next_date.strftime('%d %B %Y') }}
+                {% if item.holiday.event_time %} · {{ item.holiday.event_time.strftime('%H:%M') }}{% endif %}
+                {% if item.holiday.note %} · {{ item.holiday.note }}{% endif %}
+            </div>
+            <div class="item-tags">
+                <span class="tag">
+                    {% if item.days_left == 0 %}{{ t("days_today") }}
+                    {% elif item.days_left == 1 %}{{ t("days_tomorrow") }}
+                    {% else %}{{ t("days_in", n=item.days_left) }}{% endif %}
+                </span>
+                {% if item.holiday.remind_before %}<span class="tag">{{ t("hol_tag_remind") }}</span>{% endif %}
+            </div>
+        </div>
+        <a href="/holidays/delete/{{ item.holiday.id }}" class="btn btn-danger-ghost btn-sm">{{ t("hol_btn_delete") }}</a>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="empty card card-pad">
+        <h3>{{ t("hol_empty_h3") }}</h3>
+        <p>{{ t("hol_empty_p") }}</p>
+    </div>
+{% endif %}
+{% endblock %}

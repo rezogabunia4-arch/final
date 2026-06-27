@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}{{ t("prof_title") }} — RemindMe{% endblock %}
+{% block page_class %}page-narrow{% endblock %}
+
+{% block content %}
+
+<div class="profile-header">
+    <div class="profile-avatar">{{ user.username[0].upper() }}</div>
+    <h1>{{ user.username }}</h1>
+    <p>{{ user.email }}</p>
+</div>
+
+<div class="card card-pad" style="margin-bottom:16px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <span style="font-size:0.875rem;font-weight:600;">
+            {{ t("prof_level") }} {{ user.level }}
+        </span>
+
+        <span style="font-size:0.75rem;color:var(--muted);">
+            {{ user.xp }} / {{ next_level_xp }} {{ t("prof_xp") }}
+        </span>
+    </div>
+
+    <div class="progress-bar">
+        <div class="progress-fill" style="width:{{ progress_pct }}%"></div>
+    </div>
+</div>
+
+<div class="stats-row">
+    <div class="stat-box">
+        <div class="num">{{ pending_reminders }}</div>
+        <div class="lbl">{{ t("prof_pending") }}</div>
+    </div>
+
+    <div class="stat-box">
+        <div class="num">{{ completed_reminders }}</div>
+        <div class="lbl">{{ t("prof_completed") }}</div>
+    </div>
+
+    <div class="stat-box">
+        <div class="num">{{ user.streak }}</div>
+        <div class="lbl">{{ t("prof_streak") }}</div>
+    </div>
+</div>
+
+<div class="stats-row" style="grid-template-columns:1fr 1fr 1fr;">
+    <div class="stat-box">
+        <div class="num">{{ cal_count }}</div>
+        <div class="lbl">{{ t("prof_calendar") }}</div>
+    </div>
+
+    <div class="stat-box">
+        <div class="num">{{ holiday_count }}</div>
+        <div class="lbl">{{ t("prof_holiday") }}</div>
+    </div>
+
+    <div class="stat-box">
+        <div class="num">{{ sports_count }}</div>
+        <div class="lbl">{{ t("prof_sports") }}</div>
+    </div>
+</div>
+
+{% if badges %}
+<div class="card" style="margin-bottom:16px;">
+
+    <div style="padding:12px 16px;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);border-bottom:1px solid var(--border);">
+        {{ t("prof_badges") }}
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;padding:12px;">
+        {% for badge in badges %}
+        <div style="text-align:center;padding:10px 6px;">
+            <div style="font-size:1.25rem;margin-bottom:4px;">
+                {{ badge.icon }}
+            </div>
+
+            <div style="font-size:0.6875rem;color:var(--muted);">
+                {{ badge.name }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endif %}
+
+<div class="card info-list">
+
+    <div class="info-row">
+        <span class="lbl">{{ t("prof_coins") }}</span>
+        <span>{{ user.coins }}</span>
+    </div>
+
+    <div class="info-row">
+        <span class="lbl">{{ t("prof_total") }}</span>
+        <span>{{ total_reminders }}</span>
+    </div>
+
+    <div class="info-row">
+        <span class="lbl">{{ t("prof_theme") }}</span>
+        <span>
+            {{ t("prof_theme_dark") if user.theme in ['dark','blue','green'] else t("prof_theme_light") }}
+        </span>
+    </div>
+
+</div>
+
+<a href="/reminders" class="btn btn-primary btn-block" style="margin-top:16px;">
+    {{ t("prof_view_reminders") }}
+</a>
+
+{% endblock %}

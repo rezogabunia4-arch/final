@@ -1,0 +1,9 @@
+SECRET_KEY=722ca7abccf2dac1ded807f750fb63d9c09a07edaf843eb2fc28e73366db35c2
+
+# Mail settings (optional)
+MAIL_USERNAME=
+MAIL_PASSWORD=
+MAIL_DEFAULT_SENDER=
+
+# OpenWeather (optional)
+OPENWEATHER_API_KEY=
